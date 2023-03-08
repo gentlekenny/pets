@@ -1,26 +1,35 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { UpdatePetDto } from './dto/update-pet.dto';
+import { Pets, PetsDocument } from './schemas/pets.schema';
 
 @Injectable()
 export class PetsService {
-  create(createPetDto: CreatePetDto) {
-    return 'This action adds a new pet';
+
+  constructor(@InjectModel(Pets.name) private petsModel: Model<PetsDocument>) {
+
   }
 
-  findAll() {
-    return `This action returns all pets`;
+  async create(createPetDto: CreatePetDto) {
+    const newPet = new this.petsModel(createPetDto);
+    return await newPet.save()
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} pet`;
+  async findAll() {
+    return await this.petsModel.find({})
   }
 
-  update(id: number, updatePetDto: UpdatePetDto) {
-    return `This action updates a #${id} pet`;
+  async findOne(id: string) {
+    return await this.petsModel.findById(id)
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} pet`;
+  async update(id: string, updatePetDto: UpdatePetDto) {
+    return await this.petsModel.findByIdAndUpdate(id, updatePetDto)
+  }
+
+  async remove(id: string) {
+    return await this.petsModel.findByIdAndDelete(id)
   }
 }
