@@ -14,7 +14,7 @@ export class AuthService {
 
     async login(loginDto: LoginDto) {
         const user = await this.userService.findOne(loginDto.email)
-        const isPasswordOk = await this.comparePassword(loginDto.password, user.password)
+        const isPasswordOk = await this.validateUser(loginDto.password, user.password)
         if (isPasswordOk) {
             const payload = {
                 sub: user._id,
@@ -27,7 +27,7 @@ export class AuthService {
     }
 
 
-    async comparePassword(password: string, hashedPassword: string) {
+    async validateUser(password: string, hashedPassword: string) {
         return new Promise<boolean>((resolve, reject) => {
             bcrypt.compare(password, hashedPassword).then(result => {
                 resolve(result)
